@@ -2,42 +2,54 @@ import React, { useState, useEffect } from 'react';
 import StopWatch from '../components/stopwatch';
 import BtnGroup from '../components/BtnGroup';
 
-const App = () => {
-  const [hours, setHours] = useState(0);
-  const [min, setMinutes] = useState(0);
-  const [sec, setSeconds] = useState(0);
-  const [active, setActive] = useState(false)
 
-  useEffect(() => {
-    let timer = active ? setInterval(() => {
-      setSeconds(sec + 1);
-      if(sec === 3) {
-        setMinutes(min + 1);
-        setSeconds(0);
-      }else if(min === 3){
-        setHours(hours + 1);
-        setMinutes(0);
-      }
-    }, 1000) : setSeconds(sec);
-    return () => {
-      clearInterval(timer);
-    }
-  }, [active, hours, min, sec]);
+const App = () => {
+  const [time, setTime] = useState({ h: 0, m: 0, s: 0 });
+  const [active, setActive] = useState(false);
   
-  const StartTick = () => {
+  useEffect(() => {
+    let timerId = null;
+    let hour = 0,
+        min = 0,
+        sec = 0;
+    if(active){
+      timerId = setInterval(() => {
+        sec++;
+        if(sec === 60){
+          min++;
+          sec = 0;
+        }
+        if(min === 60){
+          hour++;
+          min = 0
+        }
+         setTime({ h: hour, m: min, s: sec });
+      }, 100);
+    }else{
+      clearInterval(timerId);
+    }
+    return () => {
+      clearInterval(timerId);
+    }
+  }, [active]);
+  const startTick = () => {
     setActive(true);
   };
-  const StopTick = () => {
+  const waitTick = () => {
     setActive(false);
   }
-  console.log(`min: ${min} sec: ${sec}`);
+  const stopTick = () => {
+    setActive(false);
+    setTime({ h: 0, m: 0, s: 0 });
+  }
+
   return (
     <div className="wrapper">
-      <BtnGroup start={StartTick} active={active} stop={StopTick} />
+      <BtnGroup start={startTick} active={active} stop={stopTick} wait={waitTick} />
       <StopWatch 
-      hours={hours > 9 ? hours : "0" + hours} 
-      minutes={min > 9 ? min : "0" + min} 
-      seconds={sec > 9 ? sec : "0" + sec } 
+      hours={time.h >= 10 ? time.h : "0" + time.h} 
+      minutes={time.m >= 10 ? time.m : "0" + time.m} 
+      seconds={time.s >= 10 ? time.s : "0" + time.s } 
       />
     </div>
   );
