@@ -1,11 +1,13 @@
 import React from 'react';
 
 
-const BtnGroup = ({ active = false, start, stop, wait, reset }) => {
+const BtnGroup = ({ status, start, stop, wait, reset, resume }) => {
     return(
         <div className="btn-group-wrapper">
-            { active === false ? <button onClick={start}>Start</button> : <button onClick={stop}>Stop</button>}
-            <button onClick={wait}>Wait</button>
+            { status === 0 && <button onClick={start}>Start</button> }
+            { status === 1 && <button onClick={stop}>Stop</button> }
+            { status === 2 && <button onClick={resume}>Resume</button> }
+            <button onDoubleClick={wait}>Wait</button>
             <button onClick={reset}>Reset</button>
         </div>
     );
